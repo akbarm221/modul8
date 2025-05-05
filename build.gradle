@@ -1,7 +1,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'com.android.application' version '7.1.1' apply false
-    id 'com.android.library' version '7.1.1' apply false
+    // Use the compatible version found in the table
+    id 'com.android.application' version '8.4.0' apply false // Example version, use the correct one!
+    id 'com.android.library' version '8.4.0' apply false     // Example version, use the correct one!
 }
 
 task clean(type: Delete) {

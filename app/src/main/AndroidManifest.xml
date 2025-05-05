@@ -13,13 +13,13 @@
         android:theme="@style/Theme.ContactHaqqV2">
         <activity
             android:name=".DetailContactActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="true" />
         <activity
             android:name=".ContactActivity"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

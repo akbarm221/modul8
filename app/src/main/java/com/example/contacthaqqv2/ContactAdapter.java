@@ -1,11 +1,8 @@
 package com.example.contacthaqqv2;
 
-import android.Manifest;
-import android.app.Activity;
+// ... import lainnya ...
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,118 +10,104 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.ListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
+// ...
 
-import java.util.ArrayList;
-import java.util.List;
+public class ContactAdapter extends ListAdapter<ContactModel, ContactAdapter.ContactViewHolder> {
 
-public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactViewHolder> {
+    private OnItemDeleteListener deleteListener;
 
-    private Context context;
-    private List<ContactModel> contactList;
+    public ContactAdapter(@NonNull DiffUtil.ItemCallback<ContactModel> diffCallback) {
+        super(diffCallback);
+    }
 
-    private static ClickListener clickListener;
+    public interface OnItemDeleteListener {
+        void onDeleteClick(ContactModel contact);
+    }
 
-    public ContactAdapter(Context context, ArrayList<ContactModel> contactList){
-        this.context = context;
-        this.contactList = contactList;
+    public void setOnItemDeleteListener(OnItemDeleteListener listener) {
+        this.deleteListener = listener;
     }
 
     @NonNull
     @Override
     public ContactViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_contact, parent, false);
-        return new ContactViewHolder(view);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_contact, parent, false);
+
+        return new ContactViewHolder(view, deleteListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
-        final ContactModel contact = contactList.get(position);
-        holder.tvName.setText(contact.getName());
-        holder.tvNumber.setText(contact.getNumber());
-
-        holder.tvCall.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_CALL);
-            intent.setData(Uri.parse("tel:"+contact.getNumber()));
-            if (ActivityCompat.checkSelfPermission(context,
-                    Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.CALL_PHONE}, 1);
-                return;
-            }
-            context.startActivity(intent);
-        });
-
-        holder.tvMessage.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_SENDTO);
-            intent.setData(Uri.parse("sms:"+contact.getNumber()));
-            context.startActivity(intent);
-        });
-
-        holder.tvWhatsapp.setOnClickListener(v -> {
-            Intent sendIntent = new Intent("android.intent.action.MAIN");
-            sendIntent.setAction(Intent.ACTION_VIEW);
-            sendIntent.setPackage("com.whatsapp");
-            String url = "https://api.whatsapp.com/send?phone="+contact.getNumber()+"&text=";
-            sendIntent.setData(Uri.parse(url));
-            context.startActivity(sendIntent);
-        });
-
-        holder.contactLayout.setOnClickListener(v -> {
-            String dataName = holder.tvName.getText().toString();
-            String dataNumber = holder.tvNumber.getText().toString();
-            String dataInstagram = contact.getInstagram();
-            String dataGroup = contact.getGroup();
-
-            Intent intent = new Intent(context, DetailContactActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putString("cname", dataName);
-            bundle.putString("cnumber", dataNumber);
-            bundle.putString("cinstagram", dataInstagram);
-            bundle.putString("cgroup", dataGroup);
-            intent.putExtras(bundle);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
-        });
-
+        ContactModel currentContact = getItem(position);
+        holder.bind(currentContact);
     }
 
-    @Override
-    public int getItemCount() {
-        return contactList.size();
-    }
 
-    public class ContactViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
+    public class ContactViewHolder extends RecyclerView.ViewHolder {
         LinearLayout contactLayout;
-        TextView tvName, tvNumber, tvCall, tvMessage, tvWhatsapp, tvDelete;
+        TextView tvName, tvNumber, tvDelete;
 
-        public ContactViewHolder(@NonNull View itemView) {
+
+        public ContactViewHolder(@NonNull View itemView, OnItemDeleteListener listener) { // Terima listener
             super(itemView);
-
             contactLayout = itemView.findViewById(R.id.contact_layout);
-            tvDelete  = itemView.findViewById(R.id.tv_delete);
             tvName = itemView.findViewById(R.id.tv_name);
             tvNumber = itemView.findViewById(R.id.tv_number);
-            tvCall = itemView.findViewById(R.id.tv_call);
-            tvMessage = itemView.findViewById(R.id.tv_message);
-            tvWhatsapp  = itemView.findViewById(R.id.tv_whatsapp);
+            tvDelete = itemView.findViewById(R.id.tv_delete);
 
-            tvDelete.setOnClickListener(this);
+
+            tvDelete.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+
+                if (listener != null && position != RecyclerView.NO_POSITION) {
+
+                    listener.onDeleteClick(getItem(position));
+                }
+            });
+
+            contactLayout.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if(position != RecyclerView.NO_POSITION){
+
+                    ContactModel contact = getItem(position);
+                    Context context = itemView.getContext();
+                    Intent intent = new Intent(context, DetailContactActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("cname", contact.getName());
+                    bundle.putString("cnumber", contact.getNumber());
+                    bundle.putString("cinstagram", contact.getInstagram());
+                    bundle.putString("cgroup", contact.getGroup());
+                    intent.putExtras(bundle);
+                    context.startActivity(intent);
+                }
+            });
+        }
+
+
+        public void bind(ContactModel contact) {
+            tvName.setText(contact.getName());
+            tvNumber.setText(contact.getNumber());
+        }
+    }
+
+
+    public static class ContactDiff extends DiffUtil.ItemCallback<ContactModel> {
+        @Override
+        public boolean areItemsTheSame(@NonNull ContactModel oldItem, @NonNull ContactModel newItem) {
+            return oldItem.getId() == newItem.getId();
         }
 
         @Override
-        public void onClick(View v) {
-            clickListener.onItemClick(getAdapterPosition(), itemView);
+        public boolean areContentsTheSame(@NonNull ContactModel oldItem, @NonNull ContactModel newItem) {
+            return oldItem.getName().equals(newItem.getName()) &&
+                    oldItem.getNumber().equals(newItem.getNumber()) &&
+                    oldItem.getGroup().equals(newItem.getGroup()) &&
+                    oldItem.getInstagram().equals(newItem.getInstagram());
         }
-    }
-
-    public void setOnItemClickListener(ContactAdapter.ClickListener clickListener) {
-        ContactAdapter.clickListener = clickListener;
-    }
-
-    public interface ClickListener {
-        void onItemClick(int position, View v);
     }
 }

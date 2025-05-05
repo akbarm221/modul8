@@ -31,7 +31,7 @@ public class DetailContactActivity extends AppCompatActivity {
         btnInstagram = findViewById(R.id.btn_instagram);
         layWhatsapp = findViewById(R.id.layout_whatsapp);
 
-//        get intent extra
+
         if (getIntent().getExtras() != null){
             Bundle bundle = getIntent().getExtras();
             String getCName = bundle.getString("cname");
