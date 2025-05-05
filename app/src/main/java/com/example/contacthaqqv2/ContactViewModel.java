@@ -1,10 +1,10 @@
-package com.example.contacthaqqv2;
+package com.example.contacthaqqv2; // Sesuaikan package
 
 import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-
 import java.util.List;
+
 
 public class ContactViewModel extends AndroidViewModel {
 
@@ -23,6 +23,11 @@ public class ContactViewModel extends AndroidViewModel {
     }
 
 
+    public LiveData<ContactModel> getContactById(int contactId) {
+        return mRepository.getContactById(contactId);
+    }
+
+
     public void insert(ContactModel contact) {
         mRepository.insert(contact);
     }
@@ -31,4 +36,6 @@ public class ContactViewModel extends AndroidViewModel {
     public void delete(ContactModel contact) {
         mRepository.delete(contact);
     }
+
+
 }

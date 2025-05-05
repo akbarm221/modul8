@@ -39,7 +39,7 @@ public class ContactActivity extends AppCompatActivity {
         etNumber = findViewById(R.id.et_number);
         etInstagram = findViewById(R.id.et_instagram);
         etGroup = findViewById(R.id.et_group);
-        btnClear = findViewById(R.id.btn_clear); // Pastikan ID di XML adalah btn_clear
+        btnClear = findViewById(R.id.btn_clear);
         btnSubmit = findViewById(R.id.btn_submit);
 
         contactAdapter = new ContactAdapter(new ContactAdapter.ContactDiff());
@@ -82,7 +82,7 @@ public class ContactActivity extends AppCompatActivity {
 
                 recyclerView.setVisibility(View.VISIBLE);
                 layAddContact.setVisibility(View.GONE);
-                // clearData(); // Opsional: bersihkan form setelah simpan
+
                 Toast.makeText(ContactActivity.this, "Kontak disimpan", Toast.LENGTH_SHORT).show();
             }
         });

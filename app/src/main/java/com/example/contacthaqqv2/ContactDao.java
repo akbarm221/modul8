@@ -6,7 +6,6 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-
 import java.util.List;
 
 @Dao
@@ -20,4 +19,10 @@ public interface ContactDao {
 
     @Query("SELECT * FROM contact_table ORDER BY contact_name ASC")
     LiveData<List<ContactModel>> getAllContacts();
+
+
+    @Query("SELECT * FROM contact_table WHERE id = :contactId LIMIT 1")
+    LiveData<ContactModel> getContactById(int contactId);
+
+
 }

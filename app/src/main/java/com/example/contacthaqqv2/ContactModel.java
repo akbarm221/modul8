@@ -22,7 +22,7 @@ public class ContactModel {
     @ColumnInfo(name = "instagram_username")
     private String instagram;
 
-    // Constructor (Room bisa pakai ini atau setter)
+
     public ContactModel(String name, String number, String group, String instagram) {
         this.name = name;
         this.number = number;
@@ -30,7 +30,7 @@ public class ContactModel {
         this.instagram = instagram;
     }
 
-    // --- Getter dan Setter (PENTING untuk Room di Java) ---
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
